@@ -150,6 +150,7 @@ class renderer_plugin_odt_page extends Doku_Renderer {
     function document_setup()
     {
         global $ID;
+        global $conf;
 
         // First, get export mode.
         $warning = '';
@@ -235,7 +236,17 @@ class renderer_plugin_odt_page extends Doku_Renderer {
 
         // Set title in meta info.
         // FIXME article title != book title  SOLUTION: overwrite at the end for book
-        $this->document->setTitle($ID);
+        $title = p_get_first_heading($ID);
+        if (empty($title)) {
+            $title = noNS($ID);
+            if ($title == $conf['start'] || $title == false) {
+                $title = noNS(getNS($ID));
+                if ($title == false) {
+                    $title = $ID;
+                }
+            }
+        }
+        $this->document->setTitle($title);
 
         // Enable/disable links according to configuration
         $disabled = $this->config->getParam ('disable_links');
